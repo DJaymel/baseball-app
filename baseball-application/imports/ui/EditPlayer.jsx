@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import { Players } from '../api/players';
 
-class New extends Component {
-  submitPlayer(event) {
+export default class EditPlayer extends Component {
+  showTeamStats() {
+    this.props.showTeamStats();
+  }
+
+  editPlayer(event) {
     event.preventDefault();
 
     let player = {
+      _id: this.props.currentPlayer._id,
       name: this.refs.name.value,
       team: this.refs.team.value,
       fielding: this.refs.fielding.value,
@@ -23,28 +26,30 @@ class New extends Component {
       owner: Meteor.userId(),
     }
 
-    Meteor.call('insertPlayer', player, (error) =>{
+    Meteor.call('updatePlayer', player, (error) =>{
       if(error) {
         alert("Something went wrong: " + error.reason);
       } else {
-        alert("Player added");
-        this.props.history.push('/');
+        alert("Player updated");
+        this.showTeamStats();
       }
     });
   }
 
   render() {
+    const currentPlayer = this.props.currentPlayer;
+
     return (
       <div className="row">
-        <form className="col s12" onSubmit={this.submitPlayer.bind(this)} >
+        <form className="col s12" onSubmit={this.editPlayer.bind(this)} >
           <h3>Add New Player</h3>
 
           <div className="row">
             <div className="input-field col s6">
-              <input placeholder="Name" ref="name" type="text" className="validate" />
+              <input placeholder="Name" ref="name" type="text" className="validate" defaultValue={currentPlayer.name} />
             </div>
             <div className="input-field col s6">
-              <input placeholder="Team" ref="team" type="text" className="validate" />
+              <input placeholder="Team" ref="team" type="text" className="validate" defaultValue={currentPlayer.team} />
             </div>
           </div>
 
@@ -148,5 +153,3 @@ class New extends Component {
     )
   }
 }
-
-export default withRouter(New);
